@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+at_exit do
+  require 'optparse'
+
+  options = {}
+  option_parser = OptionParser.new do |opts|
+    opts.banner = "Usage: bin/report --gemfile=/path/to/Gemfile"
+
+    opts.on('-g', '--gemfile GEMFILE', 'Full path to Gemfile') do |gemfile|
+      options[:gemfile] = gemfile
+    end
+
+    opts.on('-l', '--lockfile LOCKFILE', 'Full path to Gemfile.lock') do |gemfile_lock|
+      options[:gemfile_lock] = gemfile_lock
+    end
+  end
+
+  begin
+    option_parser.parse!
+
+  rescue OptionParser::ParseError => e
+    STDERR.puts e.message.red
+    puts option_parser
+    exit 1
+  end
+
+  ArcticTern.call(options[:gemfile], options[:gemfile_lock])
+end
+
+require 'bundler/setup'
+require 'arctic_tern'
+require 'colorize'
